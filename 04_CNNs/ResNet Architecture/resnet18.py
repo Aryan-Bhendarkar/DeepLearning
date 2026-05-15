@@ -8,10 +8,13 @@ class ResNet18(tf.keras.Model):
     def __init__(self, num_classes=10):
         super(ResNet18, self).__init__()
         # Stage 0: Conv(7x7, 64, stride=2) → BN → ReLU → MaxPool
-        self.layer1 = Conv2D(64, kernel_size=(7, 7), strides=2, padding='same')
+        # self.layer1 = Conv2D(64, kernel_size=(7, 7), strides=2, padding='same')
+        # We reduce filter size to avoid aggressive downscaling of 32*32 image dataset 
+        self.layer1 = Conv2D(64, kernel_size=(3, 3), strides=1, padding='same')
         self.bn1 = BatchNormalization()
         self.relu = ReLU()
-        self.maxpool = MaxPooling2D(pool_size=(3, 3), strides=2, padding='same')
+        # Removed for 32*32 image dataset - but required in the 224*224 image dataset 
+        # self.maxpool = MaxPooling2D(pool_size=(3, 3), strides=2, padding='same')
 
         # Stage 1:
         self.stage1 = Sequential([
@@ -48,7 +51,7 @@ class ResNet18(tf.keras.Model):
         x = self.layer1(x)
         x = self.bn1(x, training=training)
         x = self.relu(x)
-        x = self.maxpool(x)
+        # x = self.maxpool(x)
 
         x = self.stage1(x, training=training )
         x = self.stage2(x, training=training)
